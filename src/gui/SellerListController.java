@@ -31,6 +31,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.entities.Seller;
+import model.services.DepartmentService;
 import model.services.SellerService;
 
 public class SellerListController implements Initializable, DataChangeListener {
@@ -108,18 +109,20 @@ public class SellerListController implements Initializable, DataChangeListener {
 
 			SellerFormController controller = loader.getController();
 			controller.setSeller(obj);
-			controller.setSellerService(new SellerService());
+			controller.setServices(new SellerService(), new DepartmentService());
+			controller.loadAssociatedObjects();
 			controller.subscribeDataChangeListener(this);
 			controller.updateFormData();
 
 			Stage dialogStage = new Stage();
-			dialogStage.setTitle("Dados do departamento");
+			dialogStage.setTitle("Dados do Vendedor");
 			dialogStage.setScene(new Scene(pane));
 			dialogStage.setResizable(false);
 			dialogStage.initOwner(parentStage);
 			dialogStage.initModality(Modality.WINDOW_MODAL);
 			dialogStage.showAndWait();
 		} catch (IOException e) {
+			e.printStackTrace();
 			Alerts.showAlert("IO Exception", "Erro ao carregar a tela", e.getMessage(), AlertType.ERROR);
 		}
 	}
@@ -168,7 +171,7 @@ public class SellerListController implements Initializable, DataChangeListener {
 
 	private void removeEntity(Seller obj) {
 		Optional<ButtonType> result = Alerts.showConfirmation("Confirmação",
-				"Deseja realmente deletar este Departammento?");
+				"Deseja realmente deletar este Vendedor?");
 		if (result.get() == ButtonType.OK) {
 			if (service == null) {
 				throw new IllegalStateException("Service was null");
@@ -177,7 +180,7 @@ public class SellerListController implements Initializable, DataChangeListener {
 				service.remove(obj);
 				updateTableView();
 			} catch (DbException e) {
-				Alerts.showAlert("Erro ao remover departamento", null, e.getMessage(), AlertType.ERROR);
+				Alerts.showAlert("Erro ao remover Vendedor", null, e.getMessage(), AlertType.ERROR);
 			}
 
 		}
